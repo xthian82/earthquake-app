@@ -16,4 +16,5 @@
 <resources>
     <string name="app_name">Quake Report</string>
     <string name="empty_list">No Earthquake Information Available</string>
+    <string name="empty_forecast_list_no_network">No internet connection</string>
 </resources>

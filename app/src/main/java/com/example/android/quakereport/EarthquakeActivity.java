@@ -16,9 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EarthquakeActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Earthquake>> {
-    private static final String REQUEST_URL = "http://earthquake.usgs.gov/fdsnws/event/-1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=6&limit=10";
+    private static final String REQUEST_URL = "http://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=6&limit=10";
     private EarthquakeAdapter mAdapter;
     private View mEmptyView;
+    private View mProgressBar;
+    private ListView mEarthquakeListView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -28,17 +30,16 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
         mAdapter = new EarthquakeAdapter(this, new ArrayList<Earthquake>());
 
         // Find a reference to the {@link ListView} in the layout
-        ListView earthquakeListView = (ListView) findViewById(R.id.list);
-
+        mEarthquakeListView = (ListView) findViewById(R.id.list);
         mEmptyView = findViewById(R.id.listview_empty);
-        earthquakeListView.setEmptyView(mEmptyView);
+        mProgressBar = findViewById(R.id.progress_bar);
 
         // Set the adapter on the {@link ListView} so the list can be populated in the user interface
-        earthquakeListView.setAdapter( mAdapter );
+        mEarthquakeListView.setAdapter( mAdapter );
 
         getLoaderManager().initLoader(0, null, this).forceLoad();
 
-        earthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mEarthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Earthquake earthquake = mAdapter.getItem( position );
@@ -58,6 +59,8 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
 
     @Override
     public void onLoadFinished(Loader<List<Earthquake>> loader, List<Earthquake> data) {
+        if (mProgressBar != null) mProgressBar.setVisibility(View.GONE);
+
         mAdapter.setEarthquakeList( data );
 
         updateEmptyView( );
@@ -69,6 +72,10 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
             if ( null != tv ) {
                 // if cursor is empty, why? do we have an invalid location
                 int message = R.string.empty_list;
+
+                if (!QueryUtils.isNetworkAvailable(getApplicationContext()) ) {
+                    message = R.string.empty_forecast_list_no_network;
+                }
                 //@SunshineSyncAdapter.LocationStatus int location = Utility.getLocationStatus(getActivity());
                 /*switch (location) {
                     case SunshineSyncAdapter.LOCATION_STATUS_SERVER_DOWN:
@@ -87,6 +94,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
                         }
                 }*/
                 tv.setText(message);
+                mEarthquakeListView.setEmptyView(mEmptyView);
             }
         }
     }

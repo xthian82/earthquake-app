@@ -110,7 +110,10 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
     }
 
     public void setEarthquakeList(List<Earthquake> earthquakeList) {
+        if (earthquakeList == null) {
+            clear();
+            return;
+        }
         addAll( earthquakeList );
-        notifyDataSetChanged( );
     }
 }

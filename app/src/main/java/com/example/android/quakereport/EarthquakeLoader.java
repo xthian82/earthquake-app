@@ -30,7 +30,7 @@ public class EarthquakeLoader extends AsyncTaskLoader<List<Earthquake>> {
             // Perform HTTP request to the URL and receive a JSON response back
             String jsonResponse = QueryUtils.fetchJsonFromUrl(url);
 
-            dataList = QueryUtils.extractEarthquakes(jsonResponse);
+            dataList = QueryUtils.parseEarthquakeListFromString(jsonResponse);
         } catch (IOException e) {
             Log.e("EarthquakeLoader", "Error loadInBackground ", e);
         }

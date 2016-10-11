@@ -101,16 +101,24 @@ public final class QueryUtils {
         return earthquakes;
     }
 
+    private static HttpURLConnection openConnection(URL url, int readTimeoutMillSec, int connectTimeoutMillSec, String reqMethod) throws IOException {
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+        urlConnection.setReadTimeout    (readTimeoutMillSec);
+        urlConnection.setConnectTimeout (connectTimeoutMillSec);
+        urlConnection.setRequestMethod  (reqMethod);
+
+        return urlConnection;
+
+    }
+
     public static String fetchJsonFromUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = null;
         InputStream inputStream = null;
         String jsonResponse = null;
 
         try {
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setReadTimeout(10000);
-            urlConnection.setConnectTimeout(15000);
-            urlConnection.setRequestMethod("GET");
+            urlConnection = openConnection(url, 10000, 15000, "GET");
             urlConnection.connect();
 
             // If the request was successful read the input stream.
